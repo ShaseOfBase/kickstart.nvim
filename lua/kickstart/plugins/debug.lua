@@ -7,6 +7,7 @@
 -- kickstart.nvim and not kitchen-sink.nvim ;)
 
 return {
+
   -- NOTE: Yes, you can install new plugins here!
   'mfussenegger/nvim-dap',
   -- NOTE: And you can specify dependencies as well
@@ -31,7 +32,7 @@ return {
     require('mason-nvim-dap').setup {
       -- Makes a best effort to setup the various debuggers with
       -- reasonable debug configurations
-      automatic_setup = true,
+      automatic_installation = true,
 
       -- You can provide additional configuration to the handlers,
       -- see mason-nvim-dap README for more information
@@ -61,6 +62,28 @@ return {
       -- Set icons to characters that are more likely to work in every terminal.
       --    Feel free to remove or use ones that you like more! :)
       --    Don't feel like these are good choices.
+
+      layouts = {
+        { elements = {
+          'repl',
+        }, size = 0.3, position = 'right' },
+        {
+          elements = {
+            'stacks',
+            'breakpoints',
+          },
+          size = 0.2,
+          position = 'left',
+        },
+        {
+          elements = {
+            'console',
+          },
+          size = 0.2,
+          position = 'bottom',
+        },
+      },
+
       icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
       controls = {
         icons = {
@@ -86,5 +109,21 @@ return {
 
     -- Install golang specific config
     require('dap-go').setup()
+
+    dap.adapters.python = {
+      type = 'executable',
+      command = '/usr/bin/python3',
+      args = { '-m', 'debugpy.adapter' },
+    }
+
+    local cwd = vim.fn.getcwd()
+
+    require('dap.ext.vscode').load_launchjs(cwd .. '/.vscode/launch.json')
+
+    -- dap.configurations.python = function()
+    --   local cwd = vim.fn.getcwd()
+    --   require('dap.ext.vscode').load_launchjs(cwd .. '/.vscode/launch.json')
+    --   return {}
+    -- end
   end,
 }
