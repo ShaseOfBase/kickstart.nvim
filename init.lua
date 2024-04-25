@@ -14,8 +14,19 @@ vim.g.clipboard = {
   cache_enabled = 0,
 }
 
+-- Insert mode must delete word after <C-Del>
+
+-- insert mode must
+vim.api.nvim_set_keymap('n', '<M-v>', '<C-v>', { noremap = true, silent = true })
+
 vim.o.ignorecase = true
 vim.o.smartcase = true
+-- Move left 15 lines
+vim.api.nvim_set_keymap('n', '<M-h>', '20h', { noremap = true, silent = true })
+
+-- Move right 15 lines
+-- vim.api.nvim_set_ke
+vim.api.nvim_set_keymap('n', '<M-l>', '20l', { noremap = true, silent = true })
 
 -- Move up 15 lines
 vim.api.nvim_set_keymap('n', '<M-k>', '15k', { noremap = true, silent = true })
@@ -160,6 +171,7 @@ vim.opt.rtp:prepend(lazypath)
 --  To check the current status of your plugins, run
 --    :Lazy
 --
+--
 --  You can press `?` in this menu for help. Use `:q` to close the window
 --
 --  To update plugins you can run
@@ -167,6 +179,27 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  { 'sainnhe/sonokai' },
+  { 'github/copilot.vim' },
+  {
+    'cameron-wags/rainbow_csv.nvim',
+    config = true,
+    ft = {
+      'csv',
+      'tsv',
+      'csv_semicolon',
+      'csv_whitespace',
+      'csv_pipe',
+      'rfc_csv',
+      'rfc_semicolon',
+    },
+    cmd = {
+      'RainbowDelim',
+      'RainbowDelimSimple',
+      'RainbowDelimQuoted',
+      'RainbowMultiDelim',
+    },
+  },
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -176,9 +209,7 @@ require('lazy').setup({
       'nvim-lua/plenary.nvim',
       'hrsh7th/nvim-cmp',
     },
-    config = function()
-      require('codeium').setup {}
-    end,
+    config = function() end,
   },
 
   -- NOTE: Plugins can also be added by using a table,
@@ -191,7 +222,7 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim', opts = { sticky = false } },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -304,7 +335,6 @@ require('lazy').setup({
       -- See `:help telescope` and `:help telescope.setup()`
       local actions = require 'telescope.actions'
       require('telescope').setup {
-
         defaults = {
           -- file_sorter = require('telescope.sorters').get_fzy_sorter(),
           mappings = {
@@ -330,6 +360,7 @@ require('lazy').setup({
           },
 
           file_ignore_patterns = {
+            '%vectorbtpro/.*',
             '%.pyc',
             'venv/.*',
             '.git',
@@ -736,10 +767,10 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
+          -- { name = 'nvim_lsp' },
+          -- { name = 'luasnip' },
           { name = 'path' },
-          { name = 'codeium' },
+          { name = 'copilot' },
         },
       }
     end,
@@ -750,16 +781,21 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    'ShaseOfBase/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-storm'
+      vim.cmd.colorscheme 'lunaperche'
 
       -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd 'hi Cursor guifg=#FFFFFF guibg=#FF0000'
+      vim.cmd [[
+  hi Cursor guibg=LightYellow guifg=Black
+  hi Visual guibg=LightBlue
+]]
     end,
   },
 
@@ -860,6 +896,14 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   { import = 'custom.plugins' },
+  {
+    'mg979/vim-visual-multi',
+    branch = 'master',
+    -- Optional configuration
+    config = function()
+      -- Add any custom configuration options here
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -883,6 +927,33 @@ require('lazy').setup({
 })
 
 vim.api.nvim_set_keymap('n', '<leader>du', "<cmd>lua require'dapui'.toggle()<CR>", { noremap = true, silent = true })
+
+-- vim.cmd [[
+--   highlight multiple_cursors_cursor term=reverse cterm=reverse gui=reverse
+--   highlight link multiple_cursors_visual Visual
+-- ]]
+
+vim.keymap.set('i', '<C-j>', 'copilot#Accept("\\<CR>")', {
+  expr = true,
+  replace_keycodes = false,
+})
+vim.g.copilot_no_tab_map = true
+
+-- vim.api.nvim_create_autocmd('VimEnter', {
+--   callback = function()
+--     vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '', { noremap = true, silent = true })
+--   end,
+-- })
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    -- Unmap default Ctrl+Click behavior in normal mode
+    -- vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '', { noremap = true, silent = true })
+
+    -- Map Ctrl+Click to add a Visual Multi cursor
+    vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '<Plug>(VM-Mouse-Cursor)', { silent = true })
+  end,
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
