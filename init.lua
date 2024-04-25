@@ -55,7 +55,7 @@ vim.g.have_nerd_font = true
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -178,9 +178,14 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
+
 require('lazy').setup({
+  { 'easymotion/vim-easymotion' },
   { 'sainnhe/sonokai' },
-  { 'github/copilot.vim' },
+  {
+    'github/copilot.vim',
+  },
+
   {
     'cameron-wags/rainbow_csv.nvim',
     config = true,
@@ -398,7 +403,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -718,57 +723,56 @@ require('lazy').setup({
         -- chosen, you will need to read `:help ins-completion`
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
-        mapping = cmp.mapping.preset.insert {
-          ['<C-m>'] = cmp.mapping.confirm { select = true },
+        -- mapping = cmp.mapping.preset.insert {
+        --   ['<C-m>'] = cmp.mapping.confirm { select = true },
+        --
+        --   -- Select the [n]ext item
+        --   ['<C-n>'] = cmp.mapping.select_next_item(),
+        --   -- Select the [p]revious item
+        --   ['<C-p>'] = cmp.mapping.select_prev_item(),
+        --
+        --   -- Scroll the documentation window [b]ack / [f]orward
+        --   ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+        --   ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        -- Accept ([y]es) the completion.
+        --  This will auto-import if your LSP supports it.
+        --  This will expand snippets if the LSP sent a snippet.
+        -- If you prefer more traditional completion keymaps,
+        -- you can uncomment the following lines
+        -- ['<CR>'] = cmp.mapping.confirm { select = true },
+        --['<Tab>'] = cmp.mapping.select_next_item(),
+        --['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
-          -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
+        -- Manually trigger a completion from nvim-cmp.
+        --  Generally you don't need this, because nvim-cmp will display
+        --  completions whenever it has completion options available.
+        -- ['<CR>'] = cmp.mapping.confirm({ select = false }),
 
-          -- Scroll the documentation window [b]ack / [f]orward
-          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-          ['<C-f>'] = cmp.mapping.scroll_docs(4),
-
-          -- Accept ([y]es) the completion.
-          --  This will auto-import if your LSP supports it.
-          --  This will expand snippets if the LSP sent a snippet.
-          -- If you prefer more traditional completion keymaps,
-          -- you can uncomment the following lines
-          -- ['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
-
-          -- Manually trigger a completion from nvim-cmp.
-          --  Generally you don't need this, because nvim-cmp will display
-          --  completions whenever it has completion options available.
-          ['<C-Space>'] = cmp.mapping.complete {},
-
-          -- Think of <c-l> as moving to the right of your snippet expansion.
-          --  So if you have a snippet that's like:
-          --  function $name($args)
-          --    $body
-          --  end
-          --
-          -- <c-l> will move you to the right of each of the expansion locations.
-          -- <c-h> is similar, except moving you backwards.
-          ['<C-l>'] = cmp.mapping(function()
-            if luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            end
-          end, { 'i', 's' }),
-          ['<C-h>'] = cmp.mapping(function()
-            if luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            end
-          end, { 'i', 's' }),
-
-          -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-          --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
-        },
+        -- Think of <c-l> as moving to the right of your snippet expansion.
+        --  So if you have a snippet that's like:
+        --  function $name($args)
+        --    $body
+        --  end
+        --
+        -- <c-l> will move you to the right of each of the expansion locations.
+        -- <c-h> is similar, except moving you backwards.
+        --   ['<C-l>'] = cmp.mapping(function()
+        --     if luasnip.expand_or_locally_jumpable() then
+        --       luasnip.expand_or_jump()
+        --     end
+        --   end, { 'i', 's' }),
+        --   ['<C-h>'] = cmp.mapping(function()
+        --     if luasnip.locally_jumpable(-1) then
+        --       luasnip.jump(-1)
+        --     end
+        --   end, { 'i', 's' }),
+        --
+        --   -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
+        --   --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+        -- },
         sources = {
-          -- { name = 'nvim_lsp' },
-          -- { name = 'luasnip' },
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
           { name = 'path' },
           { name = 'copilot' },
         },
@@ -781,21 +785,18 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'ShaseOfBase/tokyonight.nvim',
+    -- 'ShaseOfBase/tokyonight.nvim',
+
+    'ellisonleao/gruvbox.nvim',
+    opts = {
+      italic = { strings = false, comments = false, keywords = false, functions = false, variables = false },
+      contrast = 'hard',
+    },
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      -- vim.cmd.colorscheme 'tokyonight-storm'
-      vim.cmd.colorscheme 'lunaperche'
-
+      vim.cmd.colorscheme 'gruvbox'
       -- You can configure highlights by doing something like:
       -- vim.cmd 'hi Cursor guifg=#FFFFFF guibg=#FF0000'
-      vim.cmd [[
-  hi Cursor guibg=LightYellow guifg=Black
-  hi Visual guibg=LightBlue
-]]
     end,
   },
 
@@ -928,32 +929,33 @@ require('lazy').setup({
 
 vim.api.nvim_set_keymap('n', '<leader>du', "<cmd>lua require'dapui'.toggle()<CR>", { noremap = true, silent = true })
 
--- vim.cmd [[
---   highlight multiple_cursors_cursor term=reverse cterm=reverse gui=reverse
---   highlight link multiple_cursors_visual Visual
--- ]]
+vim.keymap.set('i', '<C-]>', '<Plug>(copilot-accept-word)')
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    -- Map Ctrl+Click to add a Visual Multi cursor
+    vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '<Plug>(VM-Mouse-Cursor)', { silent = true })
+  end,
+})
+
+-- Use `c` to delete text and not add it to the clipboard
+vim.api.nvim_set_keymap('n', 'c', '"_c', { noremap = true, silent = true })
+
+-- Use 'd' to delete text and not add it to the clipboard
+vim.api.nvim_set_keymap('n', 'd', '"_d', { noremap = true, silent = true })
+
+-- In insert mode, use Ctrl+Del to delete the next word
+vim.api.nvim_set_keymap('i', '<C-Del>', '<C-o>dw', { noremap = true, silent = true })
+
+-- In insert mode, use Ctrl+<BS> to delete the previous word
+vim.api.nvim_set_keymap('i', '<C-BS>', '<C-w>', { noremap = true, silent = true })
 
 vim.keymap.set('i', '<C-j>', 'copilot#Accept("\\<CR>")', {
   expr = true,
   replace_keycodes = false,
 })
+
 vim.g.copilot_no_tab_map = true
-
--- vim.api.nvim_create_autocmd('VimEnter', {
---   callback = function()
---     vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '', { noremap = true, silent = true })
---   end,
--- })
-
-vim.api.nvim_create_autocmd('VimEnter', {
-  callback = function()
-    -- Unmap default Ctrl+Click behavior in normal mode
-    -- vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '', { noremap = true, silent = true })
-
-    -- Map Ctrl+Click to add a Visual Multi cursor
-    vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '<Plug>(VM-Mouse-Cursor)', { silent = true })
-  end,
-})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
