@@ -105,7 +105,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 6
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -180,6 +180,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 
 require('lazy').setup({
+  { 'averms/black-nvim' },
   {
     'ThePrimeagen/refactoring.nvim',
     dependencies = {
@@ -351,16 +352,21 @@ require('lazy').setup({
       local actions = require 'telescope.actions'
       require('telescope').setup {
         defaults = {
+          -- scroll_strategy = 'limit',
+          layout_strategy = 'flex',
           -- file_sorter = require('telescope.sorters').get_fzy_sorter(),
           mappings = {
+
             i = {
-              -- ['<C-g>'] = 'select_vertical',
+              ['<C-g>'] = 'select_vertical',
               ['<C-r>'] = function(prompt_bufnr)
                 local selection = require('telescope.actions.state').get_selected_entry()
                 actions.close(prompt_bufnr)
                 vim.api.nvim_buf_delete(selection.bufnr, { force = true })
                 vim.cmd 'Telescope buffers'
               end,
+              ['<C-d>'] = require('telescope.actions').preview_scrolling_down,
+              ['<C-u>'] = require('telescope.actions').preview_scrolling_up,
             },
 
             n = {
@@ -797,10 +803,21 @@ require('lazy').setup({
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     -- 'ShaseOfBase/tokyonight.nvim',
 
-    'ellisonleao/gruvbox.nvim',
+    'ShaseOfBase/gruvbox.nvim',
     opts = {
       italic = { strings = false, comments = false, keywords = false, functions = false, variables = false },
       contrast = 'hard',
+      palette_overrides = {
+        -- dark0 = '#E3ECED',
+        -- dark_green = '#96CE5F',
+        -- dark_green_hard = '#96CE5F',
+        -- dark_green_soft = '#96CE5F',
+        -- light_green = '#96CE5F',
+        -- light_green_hard = '#96CE5F',
+        -- light_green_soft = '#96CE5F',
+        -- neutral_green = '#96CE5F',
+        -- bright_green = '#96CE5F',
+      },
     },
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
@@ -967,7 +984,7 @@ vim.keymap.set('i', '<C-j>', 'copilot#Accept("\\<CR>")', {
 
 vim.g.copilot_no_tab_map = true
 
--- The primagens remappings
+-- The primagens remappings for refactors
 vim.keymap.set('x', '<leader>re', ':Refactor extract ')
 vim.keymap.set('x', '<leader>rf', ':Refactor extract_to_file ')
 
@@ -979,6 +996,12 @@ vim.keymap.set('n', '<leader>rI', ':Refactor inline_func')
 
 vim.keymap.set('n', '<leader>rb', ':Refactor extract_block')
 vim.keymap.set('n', '<leader>rbf', ':Refactor extract_block_to_file')
+
+-- Tell black where to find its global venv
+vim.g.python3_host_prog = '/home/travis/.config/nvim/black_venv/bin/python3'
+vim.g.black_settings = {
+  ['line-length'] = 88,
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
