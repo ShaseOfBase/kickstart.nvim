@@ -14,14 +14,25 @@ vim.g.clipboard = {
   cache_enabled = 0,
 }
 
+-- Insert mode must delete word after <C-Del>
+
+-- insert mode must
+vim.api.nvim_set_keymap('n', '<M-v>', '<C-v>', { noremap = true, silent = true })
+
 vim.o.ignorecase = true
 vim.o.smartcase = true
+-- Move left 15 lines
+vim.api.nvim_set_keymap('n', '<M-h>', '20h', { noremap = true, silent = true })
+
+-- Move right 15 lines
+-- vim.api.nvim_set_ke
+vim.api.nvim_set_keymap('n', '<M-l>', '20l', { noremap = true, silent = true })
 
 -- Move up 15 lines
-vim.api.nvim_set_keymap('n', '<M-k>', '15k', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<M-k>', '10k', { noremap = true, silent = true })
 
 -- Move down 15 lines
-vim.api.nvim_set_keymap('n', '<M-j>', '15j', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<M-j>', '10j', { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap('n', '<C-s>', ':w<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:w<CR>a', { noremap = true, silent = true })
@@ -94,7 +105,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 6
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -107,7 +118,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+-- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -160,15 +171,105 @@ vim.opt.rtp:prepend(lazypath)
 --  To check the current status of your plugins, run
 --    :Lazy
 --
+--
 --  You can press `?` in this menu for help. Use `:q` to close the window
 --
 --  To update plugins you can run
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
+
 require('lazy').setup({
+  {
+    'sbdchd/neoformat',
+    config = function()
+      vim.api.nvim_create_augroup('fmt', { clear = true })
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        group = 'fmt',
+        pattern = '*.py',
+        command = 'undojoin | Neoformat',
+      })
+    end,
+  },
+
+  { 'nvim-treesitter/nvim-treesitter-context', opts = { min_window_height = 20, max_lines = 6 } },
+  {
+    'liuchengxu/vista.vim',
+    config = function()
+      -- Set the key to toggle Vista
+      vim.api.nvim_set_keymap('n', '<leader>v', ':Vista!!<CR>', { noremap = true, silent = true })
+
+      -- Set the default executive for ctags
+      vim.g.vista_default_executive = 'ctags'
+
+      vim.g.vista_echo_cursor_strategy = 'floating_win'
+
+      -- Set the sidebar width
+      vim.g.vista_sidebar_width = 45
+
+      -- Set the font for the Vista sidebar
+      vim.g.vista_icon_indent = { '╰─▸ ', '├─▸ ' }
+
+      -- Enable fzf's preview window
+      vim.g.vista_fzf_preview = { 'right:50%' }
+
+      -- vim.g.vista_sidebar_keepalt = 1
+
+      vim.g.vista_update_on_text_changed = 1
+
+      vim.g.vista_close_on_jump = 1
+
+      vim.g.vista_stay_on_open = 1
+
+      vim.g.vista_highlight_whole_line = 1
+    end,
+  },
+  { 'sitiom/nvim-numbertoggle' },
+  {
+    'kevinhwang91/nvim-hlslens',
+    config = function()
+      require('hlslens').setup()
+    end,
+  },
+
+  { 'averms/black-nvim' },
+  {
+    'ThePrimeagen/refactoring.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+    },
+    -- config = function()
+    --   require('refactoring').setup()
+    -- end,
+  },
+  { 'easymotion/vim-easymotion' },
+  { 'sainnhe/sonokai' },
+  {
+    'github/copilot.vim',
+  },
+
+  {
+    'cameron-wags/rainbow_csv.nvim',
+    config = true,
+    ft = {
+      'csv',
+      'tsv',
+      'csv_semicolon',
+      'csv_whitespace',
+      'csv_pipe',
+      'rfc_csv',
+      'rfc_semicolon',
+    },
+    cmd = {
+      'RainbowDelim',
+      'RainbowDelimSimple',
+      'RainbowDelimQuoted',
+      'RainbowMultiDelim',
+    },
+  },
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  { 'tpope/vim-sleuth' }, -- Detect tabstop and shiftwidth automatically
 
   {
     'Exafunction/codeium.nvim',
@@ -176,9 +277,7 @@ require('lazy').setup({
       'nvim-lua/plenary.nvim',
       'hrsh7th/nvim-cmp',
     },
-    config = function()
-      require('codeium').setup {}
-    end,
+    config = function() end,
   },
 
   -- NOTE: Plugins can also be added by using a table,
@@ -191,7 +290,7 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim', opts = { sticky = false } },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -304,18 +403,22 @@ require('lazy').setup({
       -- See `:help telescope` and `:help telescope.setup()`
       local actions = require 'telescope.actions'
       require('telescope').setup {
-
         defaults = {
+          -- scroll_strategy = 'limit',
+          layout_strategy = 'flex',
           -- file_sorter = require('telescope.sorters').get_fzy_sorter(),
           mappings = {
+
             i = {
-              -- ['<C-g>'] = 'select_vertical',
+              ['<C-g>'] = 'select_vertical',
               ['<C-r>'] = function(prompt_bufnr)
                 local selection = require('telescope.actions.state').get_selected_entry()
                 actions.close(prompt_bufnr)
                 vim.api.nvim_buf_delete(selection.bufnr, { force = true })
                 vim.cmd 'Telescope buffers'
               end,
+              ['<C-d>'] = require('telescope.actions').preview_scrolling_down,
+              ['<C-u>'] = require('telescope.actions').preview_scrolling_up,
             },
 
             n = {
@@ -330,6 +433,7 @@ require('lazy').setup({
           },
 
           file_ignore_patterns = {
+            '%vectorbtpro/.*',
             '%.pyc',
             'venv/.*',
             '.git',
@@ -367,7 +471,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -585,7 +689,9 @@ require('lazy').setup({
         settings = {
           python = {
             analysis = {
-              autoSearchPaths = true,
+              typeCheckingMode = 'basic',
+              -- configFilePath = '/home/travis/.config/nvim/pyrightconfig.json',
+              autoSearchPaths = false,
               useLibraryCodeForTypes = true,
               diagnosticMode = 'workspace',
             },
@@ -687,59 +793,58 @@ require('lazy').setup({
         -- chosen, you will need to read `:help ins-completion`
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
-        mapping = cmp.mapping.preset.insert {
-          ['<C-m>'] = cmp.mapping.confirm { select = true },
+        -- mapping = cmp.mapping.preset.insert {
+        --   ['<C-m>'] = cmp.mapping.confirm { select = true },
+        --
+        --   -- Select the [n]ext item
+        --   ['<C-n>'] = cmp.mapping.select_next_item(),
+        --   -- Select the [p]revious item
+        --   ['<C-p>'] = cmp.mapping.select_prev_item(),
+        --
+        --   -- Scroll the documentation window [b]ack / [f]orward
+        --   ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+        --   ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        -- Accept ([y]es) the completion.
+        --  This will auto-import if your LSP supports it.
+        --  This will expand snippets if the LSP sent a snippet.
+        -- If you prefer more traditional completion keymaps,
+        -- you can uncomment the following lines
+        -- ['<CR>'] = cmp.mapping.confirm { select = true },
+        --['<Tab>'] = cmp.mapping.select_next_item(),
+        --['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
-          -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
+        -- Manually trigger a completion from nvim-cmp.
+        --  Generally you don't need this, because nvim-cmp will display
+        --  completions whenever it has completion options available.
+        -- ['<CR>'] = cmp.mapping.confirm({ select = false }),
 
-          -- Scroll the documentation window [b]ack / [f]orward
-          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-          ['<C-f>'] = cmp.mapping.scroll_docs(4),
-
-          -- Accept ([y]es) the completion.
-          --  This will auto-import if your LSP supports it.
-          --  This will expand snippets if the LSP sent a snippet.
-          -- If you prefer more traditional completion keymaps,
-          -- you can uncomment the following lines
-          -- ['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
-
-          -- Manually trigger a completion from nvim-cmp.
-          --  Generally you don't need this, because nvim-cmp will display
-          --  completions whenever it has completion options available.
-          ['<C-Space>'] = cmp.mapping.complete {},
-
-          -- Think of <c-l> as moving to the right of your snippet expansion.
-          --  So if you have a snippet that's like:
-          --  function $name($args)
-          --    $body
-          --  end
-          --
-          -- <c-l> will move you to the right of each of the expansion locations.
-          -- <c-h> is similar, except moving you backwards.
-          ['<C-l>'] = cmp.mapping(function()
-            if luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            end
-          end, { 'i', 's' }),
-          ['<C-h>'] = cmp.mapping(function()
-            if luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            end
-          end, { 'i', 's' }),
-
-          -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-          --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
-        },
+        -- Think of <c-l> as moving to the right of your snippet expansion.
+        --  So if you have a snippet that's like:
+        --  function $name($args)
+        --    $body
+        --  end
+        --
+        -- <c-l> will move you to the right of each of the expansion locations.
+        -- <c-h> is similar, except moving you backwards.
+        --   ['<C-l>'] = cmp.mapping(function()
+        --     if luasnip.expand_or_locally_jumpable() then
+        --       luasnip.expand_or_jump()
+        --     end
+        --   end, { 'i', 's' }),
+        --   ['<C-h>'] = cmp.mapping(function()
+        --     if luasnip.locally_jumpable(-1) then
+        --       luasnip.jump(-1)
+        --     end
+        --   end, { 'i', 's' }),
+        --
+        --   -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
+        --   --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+        -- },
         sources = {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
-          { name = 'codeium' },
+          { name = 'copilot' },
         },
       }
     end,
@@ -750,16 +855,29 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    -- 'ShaseOfBase/tokyonight.nvim',
+
+    'ShaseOfBase/gruvbox.nvim',
+    opts = {
+      italic = { strings = false, comments = false, keywords = false, functions = false, variables = false },
+      contrast = 'hard',
+      palette_overrides = {
+        -- dark0 = '#E3ECED',
+        -- dark_green = '#96CE5F',
+        -- dark_green_hard = '#96CE5F',
+        -- dark_green_soft = '#96CE5F',
+        -- light_green = '#96CE5F',
+        -- light_green_hard = '#96CE5F',
+        -- light_green_soft = '#96CE5F',
+        -- neutral_green = '#96CE5F',
+        -- bright_green = '#96CE5F',
+      },
+    },
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
-
+      vim.cmd.colorscheme 'gruvbox'
       -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd 'hi Cursor guifg=#FFFFFF guibg=#FF0000'
     end,
   },
 
@@ -860,6 +978,14 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   { import = 'custom.plugins' },
+  {
+    'mg979/vim-visual-multi',
+    branch = 'master',
+    -- Optional configuration
+    config = function()
+      -- Add any custom configuration options here
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -884,5 +1010,86 @@ require('lazy').setup({
 
 vim.api.nvim_set_keymap('n', '<leader>du', "<cmd>lua require'dapui'.toggle()<CR>", { noremap = true, silent = true })
 
+-- Maybe when I can figure out how to turn off tab...
+-- vim.keymap.set('i', '<C-]>', '<Plug>(copilot-accept-word)')
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    -- Map Ctrl+Click to add a Visual Multi cursor
+    vim.api.nvim_set_keymap('n', '<C-LeftMouse>', '<Plug>(VM-Mouse-Cursor)', { silent = true })
+  end,
+})
+
+-- Use `c` to delete text and not add it to the clipboard
+vim.api.nvim_set_keymap('n', 'c', '"_c', { noremap = true, silent = true })
+
+-- Use 'd' to delete text and not add it to the clipboard
+vim.api.nvim_set_keymap('n', 'd', '"_d', { noremap = true, silent = true })
+
+-- In insert mode, use Ctrl+Del to delete the next word
+vim.api.nvim_set_keymap('i', '<C-Del>', '<C-o>dw', { noremap = true, silent = true })
+
+-- In insert mode, use Ctrl+<BS> to delete the previous word
+vim.api.nvim_set_keymap('i', '<C-BS>', '<C-w>', { noremap = true, silent = true })
+
+vim.keymap.set('i', '<C-j>', 'copilot#Accept("\\<CR>")', {
+  expr = true,
+  replace_keycodes = false,
+})
+
+vim.g.copilot_no_tab_map = true
+
+-- The primagens remappings for refactors
+vim.keymap.set('x', '<leader>re', ':Refactor extract ')
+vim.keymap.set('x', '<leader>rf', ':Refactor extract_to_file ')
+
+vim.keymap.set('x', '<leader>rv', ':Refactor extract_var ')
+
+vim.keymap.set({ 'n', 'x' }, '<leader>ri', ':Refactor inline_var')
+
+vim.keymap.set('n', '<leader>rI', ':Refactor inline_func')
+
+vim.keymap.set('n', '<leader>rb', ':Refactor extract_block')
+vim.keymap.set('n', '<leader>rbf', ':Refactor extract_block_to_file')
+
+-- Tell black where to find its global venv
+vim.g.python3_host_prog = '/home/travis/.config/nvim/black_venv/bin/python3'
+vim.g.black_settings = {
+  ['line-length'] = 95,
+}
+
+-- Use 'd' to delete text and not add it to the clipboard (Or rather, add it to 'a' register)
+vim.keymap.set({ 'n', 'x' }, 'd', '"ad', { noremap = true, silent = true })
+
+-- Use `c` to delete text and not add it to the clipboard (Or rather, add it to 'a' register)
+vim.keymap.set({ 'n', 'x' }, 'c', '"ac', { noremap = true, silent = true })
+
+-- Set the number of lines to scroll with Ctrl + mouse wheel
+vim.api.nvim_set_keymap('', '<C-ScrollWheelUp>', '10<C-Y>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('', '<C-ScrollWheelDown>', '10<C-E>', { noremap = true, silent = true })
+
+-- Delete and enter insert mode
+vim.api.nvim_set_keymap('n', '<C-c>', 'xa', { noremap = true })
+
+vim.api.nvim_set_keymap('n', '<leader>h', '?def<CR>', { noremap = true, silent = true })
+
+-- Finding prev/next python func
+function prevPythonFunction()
+  vim.cmd '?def '
+  vim.cmd 'normal! zz'
+end
+
+function nextPythonFunction()
+  vim.cmd '/def '
+  vim.cmd 'normal! zz'
+end
+
+vim.api.nvim_set_keymap('n', '<leader>q', ':lua prevPythonFunction()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>Q', ':lua nextPythonFunction()<CR>', { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap('n', '<S-Up>', '1k', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<S-Down>', '1j', { noremap = true, silent = true })
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--

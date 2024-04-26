@@ -1,0 +1,12 @@
+{
+  "python.analysis": {
+    "autoSearchPaths": true,
+    "diagnosticMode": "workspace",
+    "useLibraryCodeForTypes": true,
+    "typeCheckingMode": "off",  // or "strict" or "off"
+    "reportMissingImports": true,  // This is an example of a specific diagnostic you can disable
+    "reportMissingTypeStubs": false
+    // Add more specific rules you want to enable or disable
+  }
+}
+

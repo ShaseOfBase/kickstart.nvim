@@ -15,12 +15,17 @@ return {
     { '\\', ':Neotree reveal<CR>', { desc = 'NeoTree reveal' } },
   },
   opts = {
-    window = {
-      position = 'float',
-      width = 0.35, -- or any other value you prefer
-      height = 1, -- or any other value you prefer
-    },
+    -- window = {
+    --   position = 'float',
+    --   width = 0.35, -- or any other value you prefer
+    --   height = 1, -- or any other value you prefer
+    -- },
     filesystem = {
+      filtered_items = {
+        visible = true, -- Set to true to show files normally hidden
+        hide_dotfiles = false, -- Set to false to show dotfiles
+        hide_gitignored = false, -- Set to false to show .gitignored files
+      },
       window = {
         mappings = {
           ['\\'] = 'close_window',
