@@ -180,6 +180,8 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 
 require('lazy').setup({
+
+  { 'nvim-treesitter/nvim-treesitter-context', opts = { min_window_height = 20, max_lines = 6 } },
   {
     'liuchengxu/vista.vim',
     config = function()
@@ -189,12 +191,10 @@ require('lazy').setup({
       -- Set the default executive for ctags
       vim.g.vista_default_executive = 'ctags'
 
-      vim.o.laststatus = 1
-
       vim.g.vista_echo_cursor_strategy = 'floating_win'
 
       -- Set the sidebar width
-      vim.g.vista_sidebar_width = 55
+      vim.g.vista_sidebar_width = 45
 
       -- Set the font for the Vista sidebar
       vim.g.vista_icon_indent = { '╰─▸ ', '├─▸ ' }
@@ -202,30 +202,24 @@ require('lazy').setup({
       -- Enable fzf's preview window
       vim.g.vista_fzf_preview = { 'right:50%' }
 
-      _G.NearestMethodOrFunction = function()
-        return vim.b.vista_nearest_method_or_function or ''
-      end
+      -- vim.g.vista_sidebar_keepalt = 1
 
-      vim.o.winbar = "%{%luaeval('NearestMethodOrFunction()')%}"
+      vim.g.vista_update_on_text_changed = 1
 
-      -- Set the statusline to display the nearest method/function
-      vim.o.statusline = "%{luaeval('NearestMethodOrFunction()')}"
+      vim.g.vista_close_on_jump = 1
 
-      -- Define an autocommand to update the nearest method/function in the statusline
-      vim.cmd [[
-        augroup VistaStatusline
-          autocmd!
-          autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
-        augroup END
-      ]]
+      vim.g.vista_stay_on_open = 1
+
+      vim.g.vista_highlight_whole_line = 1
     end,
   },
   { 'sitiom/nvim-numbertoggle' },
-  -- { 'kevinhwang91/nvim-hlslens',
-  --   config = function()
-  --     require('hlslens').setup()
-  --   end,
-  -- },
+  {
+    'kevinhwang91/nvim-hlslens',
+    config = function()
+      require('hlslens').setup()
+    end,
+  },
 
   { 'averms/black-nvim' },
   {
@@ -264,7 +258,7 @@ require('lazy').setup({
     },
   },
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  { 'tpope/vim-sleuth' }, -- Detect tabstop and shiftwidth automatically
 
   {
     'Exafunction/codeium.nvim',
@@ -1052,17 +1046,17 @@ vim.g.black_settings = {
 }
 
 -- Use 'd' to delete text and not add it to the clipboard (Or rather, add it to 'a' register)
-vim.keymap.set('n', 'd', '"ad', { noremap = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, 'd', '"ad', { noremap = true, silent = true })
 
 -- Use `c` to delete text and not add it to the clipboard (Or rather, add it to 'a' register)
-vim.keymap.set('n', 'c', '"ac', { noremap = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, 'c', '"ac', { noremap = true, silent = true })
 
 -- Set the number of lines to scroll with Ctrl + mouse wheel
 vim.api.nvim_set_keymap('', '<C-ScrollWheelUp>', '10<C-Y>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('', '<C-ScrollWheelDown>', '10<C-E>', { noremap = true, silent = true })
 
 -- Delete and enter insert mode
-vim.api.nvim_set_keymap('n', '<C-c>', 'xi', { noremap = true })
+vim.api.nvim_set_keymap('n', '<C-c>', 'xa', { noremap = true })
 
 vim.api.nvim_set_keymap('n', '<leader>h', '?def<CR>', { noremap = true, silent = true })
 
@@ -1079,6 +1073,9 @@ end
 
 vim.api.nvim_set_keymap('n', '<leader>q', ':lua prevPythonFunction()<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>Q', ':lua nextPythonFunction()<CR>', { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap('n', '<S-Up>', '1k', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<S-Down>', '1j', { noremap = true, silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
