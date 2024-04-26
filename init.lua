@@ -29,10 +29,10 @@ vim.api.nvim_set_keymap('n', '<M-h>', '20h', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<M-l>', '20l', { noremap = true, silent = true })
 
 -- Move up 15 lines
-vim.api.nvim_set_keymap('n', '<M-k>', '15k', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<M-k>', '10k', { noremap = true, silent = true })
 
 -- Move down 15 lines
-vim.api.nvim_set_keymap('n', '<M-j>', '15j', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<M-j>', '10j', { noremap = true, silent = true })
 
 vim.api.nvim_set_keymap('n', '<C-s>', ':w<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('i', '<C-s>', '<Esc>:w<CR>a', { noremap = true, silent = true })
@@ -55,7 +55,7 @@ vim.g.have_nerd_font = true
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
-vim.opt.relativenumber = false
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -118,7 +118,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+-- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -180,6 +180,53 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 
 require('lazy').setup({
+  {
+    'liuchengxu/vista.vim',
+    config = function()
+      -- Set the key to toggle Vista
+      vim.api.nvim_set_keymap('n', '<leader>v', ':Vista!!<CR>', { noremap = true, silent = true })
+
+      -- Set the default executive for ctags
+      vim.g.vista_default_executive = 'ctags'
+
+      vim.o.laststatus = 1
+
+      vim.g.vista_echo_cursor_strategy = 'floating_win'
+
+      -- Set the sidebar width
+      vim.g.vista_sidebar_width = 55
+
+      -- Set the font for the Vista sidebar
+      vim.g.vista_icon_indent = { '╰─▸ ', '├─▸ ' }
+
+      -- Enable fzf's preview window
+      vim.g.vista_fzf_preview = { 'right:50%' }
+
+      _G.NearestMethodOrFunction = function()
+        return vim.b.vista_nearest_method_or_function or ''
+      end
+
+      vim.o.winbar = "%{%luaeval('NearestMethodOrFunction()')%}"
+
+      -- Set the statusline to display the nearest method/function
+      vim.o.statusline = "%{luaeval('NearestMethodOrFunction()')}"
+
+      -- Define an autocommand to update the nearest method/function in the statusline
+      vim.cmd [[
+        augroup VistaStatusline
+          autocmd!
+          autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
+        augroup END
+      ]]
+    end,
+  },
+  { 'sitiom/nvim-numbertoggle' },
+  -- { 'kevinhwang91/nvim-hlslens',
+  --   config = function()
+  --     require('hlslens').setup()
+  --   end,
+  -- },
+
   { 'averms/black-nvim' },
   {
     'ThePrimeagen/refactoring.nvim',
@@ -187,9 +234,9 @@ require('lazy').setup({
       'nvim-lua/plenary.nvim',
       'nvim-treesitter/nvim-treesitter',
     },
-    config = function()
-      require('refactoring').setup()
-    end,
+    -- config = function()
+    --   require('refactoring').setup()
+    -- end,
   },
   { 'easymotion/vim-easymotion' },
   { 'sainnhe/sonokai' },
@@ -956,7 +1003,8 @@ require('lazy').setup({
 
 vim.api.nvim_set_keymap('n', '<leader>du', "<cmd>lua require'dapui'.toggle()<CR>", { noremap = true, silent = true })
 
-vim.keymap.set('i', '<C-]>', '<Plug>(copilot-accept-word)')
+-- Maybe when I can figure out how to turn off tab...
+-- vim.keymap.set('i', '<C-]>', '<Plug>(copilot-accept-word)')
 
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()
@@ -1003,5 +1051,35 @@ vim.g.black_settings = {
   ['line-length'] = 88,
 }
 
+-- Use 'd' to delete text and not add it to the clipboard (Or rather, add it to 'a' register)
+vim.keymap.set('n', 'd', '"ad', { noremap = true, silent = true })
+
+-- Use `c` to delete text and not add it to the clipboard (Or rather, add it to 'a' register)
+vim.keymap.set('n', 'c', '"ac', { noremap = true, silent = true })
+
+-- Set the number of lines to scroll with Ctrl + mouse wheel
+vim.api.nvim_set_keymap('', '<C-ScrollWheelUp>', '10<C-Y>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('', '<C-ScrollWheelDown>', '10<C-E>', { noremap = true, silent = true })
+
+-- Delete and enter insert mode
+vim.api.nvim_set_keymap('n', '<C-c>', 'xi', { noremap = true })
+
+vim.api.nvim_set_keymap('n', '<leader>h', '?def<CR>', { noremap = true, silent = true })
+
+-- Finding prev/next python func
+function prevPythonFunction()
+  vim.cmd '?def '
+  vim.cmd 'normal! zz'
+end
+
+function nextPythonFunction()
+  vim.cmd '/def '
+  vim.cmd 'normal! zz'
+end
+
+vim.api.nvim_set_keymap('n', '<leader>q', ':lua prevPythonFunction()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>Q', ':lua nextPythonFunction()<CR>', { noremap = true, silent = true })
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
