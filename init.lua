@@ -180,6 +180,17 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 
 require('lazy').setup({
+  {
+    'sbdchd/neoformat',
+    config = function()
+      vim.api.nvim_create_augroup('fmt', { clear = true })
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        group = 'fmt',
+        pattern = '*',
+        command = 'undojoin | Neoformat',
+      })
+    end,
+  },
 
   { 'nvim-treesitter/nvim-treesitter-context', opts = { min_window_height = 20, max_lines = 6 } },
   {
