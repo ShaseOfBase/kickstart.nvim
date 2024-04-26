@@ -186,7 +186,7 @@ require('lazy').setup({
       vim.api.nvim_create_augroup('fmt', { clear = true })
       vim.api.nvim_create_autocmd('BufWritePre', {
         group = 'fmt',
-        pattern = '*',
+        pattern = '*.py',
         command = 'undojoin | Neoformat',
       })
     end,
@@ -689,7 +689,9 @@ require('lazy').setup({
         settings = {
           python = {
             analysis = {
-              autoSearchPaths = true,
+              typeCheckingMode = 'basic',
+              -- configFilePath = '/home/travis/.config/nvim/pyrightconfig.json',
+              autoSearchPaths = false,
               useLibraryCodeForTypes = true,
               diagnosticMode = 'workspace',
             },
@@ -1053,7 +1055,7 @@ vim.keymap.set('n', '<leader>rbf', ':Refactor extract_block_to_file')
 -- Tell black where to find its global venv
 vim.g.python3_host_prog = '/home/travis/.config/nvim/black_venv/bin/python3'
 vim.g.black_settings = {
-  ['line-length'] = 88,
+  ['line-length'] = 95,
 }
 
 -- Use 'd' to delete text and not add it to the clipboard (Or rather, add it to 'a' register)
