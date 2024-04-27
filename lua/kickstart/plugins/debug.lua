@@ -53,6 +53,7 @@ return {
       },
     }
 
+    vim.api.nvim_set_keymap('n', '<F3>', '<Cmd>lua require"dapui".open()<CR>', { noremap = true, silent = true })
     -- Basic debugging keymaps, feel free to change to your liking!
     vim.keymap.set('n', '<F5>', dap.continue, { desc = 'Debug: Start/Continue' })
     vim.keymap.set('n', '<F1>', dap.step_into, { desc = 'Debug: Step Into' })

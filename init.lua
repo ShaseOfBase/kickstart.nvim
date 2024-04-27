@@ -685,12 +685,16 @@ require('lazy').setup({
         },
       }
 
-      require('lspconfig').pyright.setup {
+      require('lspconfig').pylance.setup {
+        on_attach = function(client, bufnr)
+          -- Enable completion triggered by <c-x><c-o>
+          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+        end,
         settings = {
           python = {
             analysis = {
+              autoImportCompletions = true,
               typeCheckingMode = 'basic',
-              -- configFilePath = '/home/travis/.config/nvim/pyrightconfig.json',
               autoSearchPaths = false,
               useLibraryCodeForTypes = true,
               diagnosticMode = 'workspace',
@@ -698,6 +702,29 @@ require('lazy').setup({
           },
         },
       }
+      -- require('lspconfig').pyright.setup {
+      --   on_attach = function(client, bufnr)
+      --     -- Enable completion triggered by <c-x><c-o>
+      --     vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+      --     -- Setup auto-import
+      --     client.server_capabilities.document_formatting = true
+      --   end,
+      --   settings = {
+      --     python = {
+      --       analysis = {
+      --         autoImportCompletions = true,
+      --         typeCheckingMode = 'basic',
+      --         -- configFilePath = '/home/travis/.config/nvim/pyrightconfig.json',
+      --         autoSearchPaths = false,
+      --         useLibraryCodeForTypes = true,
+      --         diagnosticMode = 'workspace',
+      --       },
+      --       inlayHints = {
+      --         autoImportCompletions = true, -- Enable inlay hints for auto-imports
+      --       },
+      --     },
+      --   },
+      -- }
     end,
   },
 
@@ -794,12 +821,12 @@ require('lazy').setup({
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         -- mapping = cmp.mapping.preset.insert {
-        --   ['<C-m>'] = cmp.mapping.confirm { select = true },
+        ['<C-m>'] = cmp.mapping.confirm { select = true },
         --
         --   -- Select the [n]ext item
-        --   ['<C-n>'] = cmp.mapping.select_next_item(),
+        ['<C-n>'] = cmp.mapping.select_next_item(),
         --   -- Select the [p]revious item
-        --   ['<C-p>'] = cmp.mapping.select_prev_item(),
+        ['<C-p>'] = cmp.mapping.select_prev_item(),
         --
         --   -- Scroll the documentation window [b]ack / [f]orward
         --   ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -826,16 +853,16 @@ require('lazy').setup({
         --
         -- <c-l> will move you to the right of each of the expansion locations.
         -- <c-h> is similar, except moving you backwards.
-        --   ['<C-l>'] = cmp.mapping(function()
-        --     if luasnip.expand_or_locally_jumpable() then
-        --       luasnip.expand_or_jump()
-        --     end
-        --   end, { 'i', 's' }),
-        --   ['<C-h>'] = cmp.mapping(function()
-        --     if luasnip.locally_jumpable(-1) then
-        --       luasnip.jump(-1)
-        --     end
-        --   end, { 'i', 's' }),
+        ['<C-l>'] = cmp.mapping(function()
+          if luasnip.expand_or_locally_jumpable() then
+            luasnip.expand_or_jump()
+          end
+        end, { 'i', 's' }),
+        ['<C-h>'] = cmp.mapping(function()
+          if luasnip.locally_jumpable(-1) then
+            luasnip.jump(-1)
+          end
+        end, { 'i', 's' }),
         --
         --   -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --   --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
